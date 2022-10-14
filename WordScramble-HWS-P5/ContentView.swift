@@ -32,6 +32,7 @@ struct ContentView: View {
             }
             .navigationTitle(rootWord)
             .onSubmit(addNewWord)
+            .onAppear(perform: startGame)
         }
     }
     
@@ -43,6 +44,19 @@ struct ContentView: View {
             useWords.insert(answer, at: 0)
         }
         newWord.removeAll()
+    }
+    
+    func startGame() {
+        if let startWordURL = Bundle.main.url(forResource: "start", withExtension: "txt") {
+            if let startWords = try? String(contentsOf: startWordURL){
+                let allWords = startWords.components(separatedBy: .newlines)
+                rootWord = allWords.randomElement() ?? "silkworm"
+                
+                return
+            }
+        }
+        
+        fatalError("Tidak berhasil menemukan start.txt pada app bundle")
     }
 }
 
