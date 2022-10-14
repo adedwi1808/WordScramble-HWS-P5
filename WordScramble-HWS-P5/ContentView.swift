@@ -39,8 +39,9 @@ struct ContentView: View {
         let answer = newWord.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
         guard answer.count > 0 else {return}
         
-        
-        useWords.insert(answer, at: 0)
+        withAnimation {
+            useWords.insert(answer, at: 0)
+        }
         newWord.removeAll()
     }
 }
