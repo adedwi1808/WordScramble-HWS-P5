@@ -23,7 +23,10 @@ struct ContentView: View {
                 
                 Section {
                     ForEach(useWords, id: \.self) { word in
-                        Text(word)
+                        HStack {
+                            Image(systemName: "\(word.count).circle.fill")
+                            Text(word)
+                        }
                     }
                 }
             }
