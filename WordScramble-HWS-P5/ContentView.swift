@@ -9,9 +9,12 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var useWords = [String]()
-    @State private var rootWord = ""
-    @State private var newWord = ""
+    @State private var rootWord: String = ""
+    @State private var newWord: String = ""
     
+    @State private var errorTitle: String = ""
+    @State private var errorMessage: String = ""
+    @State private var showingError: Bool = false
     
     var body: some View {
         NavigationView {
@@ -33,12 +36,32 @@ struct ContentView: View {
             .navigationTitle(rootWord)
             .onSubmit(addNewWord)
             .onAppear(perform: startGame)
+            .alert(errorTitle, isPresented: $showingError) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(errorMessage)
+            }
         }
     }
     
     func addNewWord() {
         let answer = newWord.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
         guard answer.count > 0 else {return}
+        
+        guard isOriginal(word: answer) else {
+            wordError(title: "Kata telah ada", message: "Coba Masukkan kata lain")
+            return
+        }
+        
+        guard isPossible(word: answer) else {
+            wordError(title: "Kata tidak memungkinkan", message: "Anda tidak bisa menggunakan kata dari \(rootWord)")
+            return
+        }
+        
+        guard isReal(word: answer) else {
+            wordError(title: "Inputan bukan kata yang valid dalam bahasa inggris", message: "Tidak bisa memasukkan kata selain bahasa inggris atau kata yang tidak bermakna!")
+            return
+        }
         
         withAnimation {
             useWords.insert(answer, at: 0)
@@ -81,6 +104,12 @@ struct ContentView: View {
         let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
         
         return misspelledRange.location == NSNotFound
+    }
+    
+    func wordError(title: String, message: String) {
+        errorMessage = message
+        errorTitle = title
+        showingError = true
     }
 }
 
