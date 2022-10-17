@@ -15,11 +15,16 @@ struct ContentView: View {
     @State private var errorTitle: String = ""
     @State private var errorMessage: String = ""
     @State private var showingError: Bool = false
+    @State private var userScore: Int = 0
     
     var body: some View {
         NavigationView {
             List {
-                Section {
+                Section("Score") {
+                    Text("\(userScore)")
+                }
+                
+                Section("Enter Your Word") {
                     TextField("Enter your word", text: $newWord)
                         .textInputAutocapitalization(.none)
                 }
@@ -41,12 +46,16 @@ struct ContentView: View {
             } message: {
                 Text(errorMessage)
             }
+            .toolbar {
+                Spacer()
+                Button("Start game", action: startGame)
+            }
         }
     }
     
     func addNewWord() {
         let answer = newWord.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
-        guard answer.count > 0 else {return}
+        guard answer.count > 3 else {return}
         
         guard isOriginal(word: answer) else {
             wordError(title: "Kata telah ada", message: "Coba Masukkan kata lain")
@@ -62,7 +71,7 @@ struct ContentView: View {
             wordError(title: "Inputan bukan kata yang valid dalam bahasa inggris", message: "Tidak bisa memasukkan kata selain bahasa inggris atau kata yang tidak bermakna!")
             return
         }
-        
+        userScore += 10
         withAnimation {
             useWords.insert(answer, at: 0)
         }
@@ -74,7 +83,7 @@ struct ContentView: View {
             if let startWords = try? String(contentsOf: startWordURL){
                 let allWords = startWords.components(separatedBy: .newlines)
                 rootWord = allWords.randomElement() ?? "silkworm"
-                
+                userScore = 0
                 return
             }
         }
